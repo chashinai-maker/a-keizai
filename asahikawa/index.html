@@ -1,0 +1,69 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>経済学 Webワークシート</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--tx:#222;--sub:#666;--ac:#1f7a73;--line:#ddd;--err:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#1c1d1f;--card:#26282b;--tx:#eee;--sub:#aaa;--ac:#5cc2b8;--line:#3a3c40;--err:#f2b8b5}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;line-height:1.7}
+main{max-width:640px;margin:0 auto;padding:32px 16px}h1{font-size:1.35rem;margin:0 0 4px}p.sub{color:var(--sub);margin:0 0 24px;font-size:.92rem}
+form{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+label{display:block;font-weight:bold;margin-bottom:8px}
+input[type=password]{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--tx)}
+button{margin-top:12px;width:100%;font-size:16px;padding:12px;border:0;border-radius:8px;background:var(--ac);color:#fff;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6}.err{color:var(--err);margin:10px 0 0;min-height:1.5em;font-size:.92rem}
+section.course{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:16px}
+section.course h2{font-size:1.1rem;margin:0 0 8px}ul{list-style:none;margin:0;padding:0}
+li a{display:block;padding:12px 4px;border-top:1px solid var(--line);color:var(--ac);text-decoration:none;font-weight:bold}
+li a span{display:block;color:var(--sub);font-weight:normal;font-size:.85rem}li.none{padding:12px 4px;border-top:1px solid var(--line);color:var(--sub)}
+.out{text-align:center;margin-top:24px}.out button{width:auto;background:none;color:var(--sub);border:1px solid var(--line);font-weight:normal;font-size:.9rem;padding:8px 16px}
+.hide{display:none}
+</style></head><body><main>
+
+<h1>経済学 Webワークシート</h1><p class="sub">授業で伝えたパスワードを入れてください。一度入れると、この端末では次から自動で開きます。</p>
+<form id="f"><label for="pw">パスワード</label>
+<input id="pw" type="password" autocomplete="current-password" required>
+<button id="go">開く</button><p class="err" id="err" role="alert"></p></form>
+<div id="list" class="hide"></div>
+<div class="out hide" id="outw"><button id="out">この端末からパスワードを消す</button></div>
+<script>
+const ITER=200000;
+const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function dec(blob,pw){
+  const km=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:ub(blob.s),iterations:ITER,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(blob.i)},key,ub(blob.c));
+  return new TextDecoder().decode(pt);
+}
+const PK="kz-site-pw:";
+const getPw=c=>{try{return localStorage.getItem(PK+c)}catch(e){return null}};
+const setPw=(c,p)=>{try{localStorage.setItem(PK+c,p)}catch(e){}};
+const delPw=c=>{try{localStorage.removeItem(PK+c)}catch(e){}};
+function noCrypto(el){if(!(window.crypto&&crypto.subtle)){el.textContent="このブラウザでは開けません。https のアドレスで開いているか確認してください。";return true}return false}
+
+const C={"asahikawa": {"s": "NVh74rkiErG17A+K38x9Ww==", "i": "pd6pddQdRzLiZ5xT", "c": "fcw8EkBNeIAJVa3qYKOgcmN8tzKYUSm7bgY902g5MR5xY8tqVFeUF0tRCoxAkU2TRC7NCPXJ7w2kce+nM/Oqzai/JTxVy79MNqV0VwXr8xGetEVLarh8YK2BZMOfM/RwU7HFQVvVmcz5ceuB/8KE5TOfckqDaf4n4gWhGGclckAweuuU51JuRE+6/Am+VszIOB6Gw0vw5Z9t3GI04Jh4NBv0bwi4GoK4wzARp2eXVxADhHwk6yxTFI4wVCW9YJuJ+up4T1AXvSuizR7zi7Do6cFF2Qcvf9vafXYOLxdZTU56XjAfZvdPomv3S5C/LRyYk0UU4kh0pT/Yc8jGKCCpgoOoVMnAxxzN2s6imL23VrSjnBlJOjsfZZROnOqjS/KrepZcJZTy47ynloX2m310y+l4Sm97y3mNcs+Dd1sveiQvCAqR+rn93WS6W9C4C1H3Lv6cG4kotu7A5c3KhnUl7WD7/tUgsF3EDcGQYVg0MP2WI8Fxki+XAV+O6RIMhS7xrlB4qv3pi6778aOdpGEdXRTRYTc9ulmivMrDF+F3ua1WUhK9T3RK9c0/fKCTrpMmWNO06/Zz5J41LvZHANEm6Gpoz8ZbDXoDmj6jM5LGzPAyXDfQkVXvO2FOb8lLDDJf7qJZY7PNKe7XA95sl0kY4a405Ufezf+baMM="}, "nayoro-keizai": {"s": "XeIUu+2WhLYlGvhXEzmqmw==", "i": "1fj/FqS11Zj2jxlv", "c": "TmAspqL0WI4Sk1YjLn1oT3rqjclBS5uGvuPHUfoUfOEEjQRFUZiJLeevIRhC1IhLy4o3mK+iuySPX/e2XJ69eRhdsWwKYMqAVB5z"}, "nayoro-gendai": {"s": "Nh38neDdF44zrye3N8lNLg==", "i": "IlYFgsqTmwvfcc0D", "c": "RVRCkTUhPXojhU5a2b7Ww7KQNlUFbjRUJnf9CvbHACpJK1XaXGneoShJU0AsU/0fUUGqeSKU35WwwNPuBvY6NsSRwD0/Qz5ZUZizIxRvjAMgQ2EzZeSD5GCGJbtKuxVb4YUaYyTJcubb8oP0wE2dJ4mQaprkD1TjOTFKS2UhH7GbBagLt2gY2+E4cbu8L55qFd+MsNyD/QznaRkz1Iu5gAYoyJA0tie6xYbVSu+o35g3FCjd4MW5OJDNfCIkO44Nruflw8RIxSLwSgUHi547dKQD/hazDpZ4ynP61gCam54KC2AJRMjlVVbOaX6EzY2Fs09TodGgD3YOfE+hVtxvImXvsdRUETf8208i6YG9nRsg"}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function show(opened){
+  const L=document.getElementById("list");L.innerHTML="";
+  for(const o of opened){const d=o.d;
+    let h='<section class="course"><h2>'+esc(d.title)+'</h2><ul>';
+    if(!d.items.length)h+='<li class="none">まだ公開していません</li>';
+    for(const it of d.items)h+='<li><a href="'+esc(it.href)+'">'+esc(it.title)+(it.note?'<span>'+esc(it.note)+'</span>':'')+'</a></li>';
+    L.insertAdjacentHTML("beforeend",h+'</ul></section>');}
+  L.classList.remove("hide");document.getElementById("outw").classList.remove("hide");
+}
+async function tryAll(pw){const r=[];for(const k in C){try{r.push({k,d:JSON.parse(await dec(C[k],pw))})}catch(e){}}return r}
+async function auto(){const r=[];for(const k in C){const p=getPw(k);if(!p)continue;try{r.push({k,d:JSON.parse(await dec(C[k],p))})}catch(e){delPw(k)}}if(r.length)show(r)}
+const err=document.getElementById("err");
+if(!noCrypto(err))auto();
+document.getElementById("f").addEventListener("submit",async e=>{e.preventDefault();
+  const pw=document.getElementById("pw").value.trim(),b=document.getElementById("go");if(!pw)return;
+  b.disabled=true;err.textContent="確認中…";
+  const r=await tryAll(pw);b.disabled=false;
+  if(!r.length){err.textContent="パスワードが違います。";return}
+  err.textContent="";r.forEach(o=>setPw(o.k,pw));
+  const all=[];for(const k in C){const p=getPw(k);if(!p)continue;try{all.push({k,d:JSON.parse(await dec(C[k],p))})}catch(e){}}
+  show(all);document.getElementById("pw").value="";
+});
+document.getElementById("out").addEventListener("click",()=>{for(const k in C)delPw(k);location.reload()});
+</script></main></body></html>
